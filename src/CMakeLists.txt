@@ -29,6 +29,9 @@ message(STATUS "POCKETSPHINX_LIBRARIES => " "${POCKETSPHINX_LIBRARIES}")
 
 PROTOBUF_GENERATE_CPP(MALOS_PROTO_SRC MALOS_PROTO_HEADER ../protocol-buffers/malos/driver.proto)
 
+# zwave_commands.proto
+PROTOBUF_GENERATE_CPP(ZWAVE_COMMANDS_PROTO_SRC ZWAVE_COMMANDS_PROTO_HEADER ../protocol-buffers/malos/zwave_commands.proto)
+
 include_directories(
   ${PROJECT_BINARY_DIR} # Protos.
   ${PROTOBUF_INCLUDE_DIRS})
@@ -36,7 +39,7 @@ include_directories(
 set(malos_wakeword_src
   malos_wakeword.cpp
   driver_wakeword.cpp driver_wakeword.h
-  ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
+  ${ZWAVE_COMMANDS_PROTO_SRC} ${MALOS_PROTO_SRC} ${MALOS_PROTO_HEADER}
 )
 
 add_executable(malos_wakeword ${malos_wakeword_src})
