@@ -16,15 +16,17 @@ var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
 var protoBuf = require("protobufjs");
 var zmq = require('zmq');
 
-const PROTO_PATH = '../../protocol-buffers/'
+const PROTO_PATH = '../../protocol-buffers/';
+var assetsPath = '/home/pi/wakeword/assets';
+var audioPath = assetsPath + '/audio';
 
 //  Load proto files
 var driverProtoBuilder = protoBuf.loadProtoFile({
-  root: PROTO_PATH, 
+  root: PROTO_PATH,
   file: 'matrix_io/malos/v1/driver.proto'
 })
 var ioProtoBuilder = protoBuf.loadProtoFile({
-  root: PROTO_PATH, 
+  root: PROTO_PATH,
   file: 'matrix_io/malos/v1/io.proto'
 })
 
@@ -56,9 +58,9 @@ errorSocket.on('message', function(error_message) {
 function startWakeUpRecognition(){
   console.log('<== config wakeword recognition..')
   var wakeword_config = new matrix.malos.v1.io.WakeWordParams;
-  wakeword_config.set_wake_word("MIA");
-  wakeword_config.set_lm_path("/home/pi/assets/9854.lm");
-  wakeword_config.set_dic_path("/home/pi/assets/9854.dic");
+  wakeword_config.set_wake_word("MATRIX");
+  wakeword_config.set_lm_path("/home/pi/assets/6882.lm");
+  wakeword_config.set_dic_path("/home/pi/assets/6882.dic");
   wakeword_config.set_channel(matrix.malos.v1.io.WakeWordParams.MicChannel.channel8);
   wakeword_config.set_enable_verbose(false)
   sendConfigProto(wakeword_config);
@@ -82,22 +84,13 @@ updateSocket.subscribe('')
 updateSocket.on('message', function(wakeword_buffer) {
   var wakeWordData = new matrix.malos.v1.io.WakeWordParams.decode(wakeword_buffer);
   console.log('==> WakeWord Reached:',wakeWordData.wake_word)
-    
+
     switch(wakeWordData.wake_word) {
-      case "MIA RING RED":
+      case /MATRIX(( NOTE) ?MEETING|APPOINTMENT) AT 3 PM.*/.test(str):
         setEverloop(255, 0, 25, 0, 0.05)
         break;
-      case "MIA RING BLUE":
-        setEverloop(0, 25, 255, 0, 0.05) 
-        break;
-      case "MIA RING GREEN":
-        setEverloop(0, 255, 100, 0, 0.05) 
-        break;
-      case "MIA RING ORANGE":
-        setEverloop(255, 77, 0, 0, 0.05) 
-        break;
-      case "MIA RING CLEAR":
-        setEverloop(0, 0, 0, 0, 0) 
+      case /MATRIX(( NOTE) ?EGGS|CHEESE|BREAD|LETTUCE).*/.test(str):
+        setEverloop(255, 0, 25, 0, 0.05)
         break;
     }
 });
@@ -124,7 +117,7 @@ function setEverloop(r, g, b, w, i) {
 }
 
 /**************************************
- * sendConfigProto: build Proto message 
+ * sendConfigProto: build Proto message
  **************************************/
 
 function sendConfigProto(cfg){
@@ -138,5 +131,3 @@ function sendConfigProto(cfg){
  **********************************************/
 
 startWakeUpRecognition();
-
-
