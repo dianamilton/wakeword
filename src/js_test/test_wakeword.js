@@ -16,7 +16,7 @@ var creator_everloop_base_port = 20013 + 8 // port for Everloop driver.
 var protoBuf = require("protobufjs");
 var zmq = require('zmq');
 
-var protoBuilder = protoBuf.loadProtoFile('../../protocol-buffers/malos/driver.proto');
+const PROTO_PATH = '../../protocol-buffers/';
 var assetsPath = '/home/pi/wakeword/assets';
 var audioPath = assetsPath + '/audio';
 
